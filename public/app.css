@@ -1,6 +1,8 @@
 
 body {
   background-color: #bdc3c7;
+  overflow: hidden;
+  height:100%;
 }
 
 nav div > h4 {
@@ -33,6 +35,13 @@ div.lista {
   max-height: 100%;
   overflow: scroll;
 }
+
+#lista {
+    /* max-height: 100%; */
+    /* overflow-y: scroll; */
+    overflow-x: hidden;
+    height: 90vh;
+  }
 
 .lista img {
   max-width: 250px !important;
