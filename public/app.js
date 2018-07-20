@@ -1,3 +1,5 @@
+var prefer = false
+
 //Inicializador del elemento Slider
 $("#rangoPrecio").ionRangeSlider({
     type: "double",
@@ -9,27 +11,26 @@ $("#rangoPrecio").ionRangeSlider({
     prefix: "$"
 })
 
-function setSearch() {
-    let busqueda = $('#checkPersonalizada')
-    busqueda.on('change', (e) => {
-        if (this.customSearch == false) {
-            this.customSearch = true
-        } else {
-            this.customSearch = false
-        }
-        $('#personalizada').toggleClass('invisible')
-    })
-}
+// function setSearch() {
+//     let busqueda = $('#checkPersonalizada')
+//     busqueda.on('change', (e) => {
+//         if (this.customSearch == false) {
+//             this.customSearch = true
+//         } else {
+//             this.customSearch = false
+//         }
+//         $('#personalizada').toggleClass('invisible')
+//     })
+// }
 
-setSearch()
+// setSearch()
 
 console.log('Client-side code running');
 
 const button = document.getElementById('buscar');
-button.addEventListener('click', function (e) {
-
+button.addEventListener('click', (e) => {
     console.log('button was clicked');
-    fetch('/clicked', { method: 'GET' })
+    fetch('/search', { method: 'GET' })
         .then(function (response) {
             if (response.ok) return response.json();
             throw new Error('Request failed.');
@@ -76,4 +77,48 @@ button.addEventListener('click', function (e) {
         .catch(function (error) {
             console.log(error);
         });
+});
+
+const check = document.getElementById('checkPersonalizada')
+check.addEventListener('click', function () {
+    if (check.checked == true) {
+        console.log('check activado')
+        prefer = true
+        fetch('/custome', { method: 'GET' })
+            .then(function (response) {
+                if (response.ok) return response.json();
+                throw new Error('Request failed.');
+            })
+            .then(function (data) {
+                console.log(data)
+                var listaCiudad = document.getElementById("ciudad");
+                var cities = data.ciudades
+                for (var i = 0; i < cities.length; i++) {
+                    var opt = document.createElement("option");
+                    opt.value = i
+                    opt.text = cities[i];
+                    listaCiudad.add(opt);
+                }
+                $('#ciudad').show()
+
+                var listaTipo = document.getElementById("tipo");
+                var types = data.tipos
+                for (var i = 0; i < types.length; i++) {
+                    var opt = document.createElement("option");
+                    opt.value = i
+                    opt.text = types[i];
+                    listaTipo.add(opt);
+                }
+                $('#tipo').show()
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        $('#personalizada').show();
+    }
+    else {
+        console.log('check desactivado')
+        $('#personalizada').hide()
+        prefer = false
+    }
 });
