@@ -42,20 +42,23 @@ button.addEventListener('click', (e) => {
     var check = document.getElementById('checkPersonalizada')
     var ciudad = "Escoge una ciudad"
     var tipo = "Escoge un tipo"
-    var precio = "undefined"
+    var precio_desde = "0"
+    var precio_hasta = "0"
     if (check.checked == true) {
         ciudad = getSelectedOption('ciudad')
         tipo = getSelectedOption('tipo')
-        precio = document.getElementById('rangoPrecio').text
+        precio_desde = $("#rangoPrecio").data("from")
+        precio_hasta = $("#rangoPrecio").data("to")
     }
 
     var data = {
         "ciudad": ciudad,
         "tipo": tipo,
-        "precio": precio
+        "precio_desde": precio_desde,
+        "precio_hasta": precio_hasta
     };
 
-    fetch(`/search/${data.ciudad}/${data.tipo}/${data.precio}`, { method: 'GET' })
+    fetch(`/search/${data.ciudad}/${data.tipo}/${data.precio_desde}/${data.precio_hasta}`, { method: 'GET' })
         .then(function (response) {
             if (response.ok) return response.json();
             throw new Error('Request failed.');

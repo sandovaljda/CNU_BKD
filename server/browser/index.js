@@ -2,22 +2,28 @@ const Storage = require('../storage/index'),
     express = require('express'),
     Router = express.Router()
 
-Router.get("/search/:city/:type/:price", function (req, res) {
-    console.log("*************************")
-    console.log(JSON.stringify(req.params.city))
-    console.log(JSON.stringify(req.params.type))
-    console.log(JSON.stringify(req.params.price))
-    console.log("-------------------------")
+Router.get("/search/:city/:type/:price_from/:price_to", function (req, res) {
     var city = ""
     var type = ""
-    var price = req.params.price
+    var price = [0,0]
     if (req.params.city != "Escoge una ciudad") {
         city = req.params.city
     }
     if (req.params.type != "Escoge un tipo") {
         type = req.params.type
     }
-    // price = req.params.price
+    if (req.params.price_from != "0" && req.params.price_to != "0") {
+        price = [parseInt(req.params.price_from) , parseInt(req.params.price_to)] 
+    }
+
+    
+    console.log("*************************")
+    console.log(JSON.stringify(city))
+    console.log(JSON.stringify(type))
+    console.log(JSON.stringify(price))
+    console.log("-------------------------")
+
+
     Storage.getData()
         .then(function (data) {
             var jsonDatos = data
@@ -29,8 +35,8 @@ Router.get("/search/:city/:type/:price", function (req, res) {
                 jsonDatos = filtrarDatosPorTipo(jsonDatos, type)
             }
 
-            if (price != "undefined") {
-                jsonDatos = filtrarDatosPorRango(jsonDatos, type)
+            if (req.params.price_from != "0" && req.params.price_to != "0") {
+                jsonDatos = filtrarDatosPorRango(jsonDatos, price)
             }
 
             res.json(jsonDatos)
@@ -63,7 +69,11 @@ function filtrarDatosPorTipo(datos, type) {
 function filtrarDatosPorRango(datos, rango) {
     var output = new Array()
     for (var i = 0; i < datos.length; i++) {
-
+        var precio_s = datos[i].Precio.split("$")[1]
+        var precio = parseInt(precio_s.split(",")[0] + precio_s.split(",")[1])
+        if(precio>=rango[0] && precio<=rango[1]){
+            output.push(datos[i])
+        }
     }
 
     return output
