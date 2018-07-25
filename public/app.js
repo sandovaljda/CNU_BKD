@@ -25,12 +25,37 @@ $("#rangoPrecio").ionRangeSlider({
 
 // setSearch()
 
+function getSelectedOption(elementId) {
+    var elt = document.getElementById(elementId);
+
+    if (elt.selectedIndex == -1)
+        return null;
+
+    return elt.options[elt.selectedIndex].text;
+}
+
 console.log('Client-side code running');
 
 const button = document.getElementById('buscar');
 button.addEventListener('click', (e) => {
     console.log('button was clicked');
-    fetch('/search', { method: 'GET' })
+    var check = document.getElementById('checkPersonalizada')
+    var ciudad = "Escoge una ciudad"
+    var tipo = "Escoge un tipo"
+    var precio = "undefined"
+    if (check.checked == true) {
+        ciudad = getSelectedOption('ciudad')
+        tipo = getSelectedOption('tipo')
+        precio = document.getElementById('rangoPrecio').text
+    }
+
+    var data = {
+        "ciudad": ciudad,
+        "tipo": tipo,
+        "precio": precio
+    };
+
+    fetch(`/search/${data.ciudad}/${data.tipo}/${data.precio}`, { method: 'GET' })
         .then(function (response) {
             if (response.ok) return response.json();
             throw new Error('Request failed.');
@@ -41,35 +66,35 @@ button.addEventListener('click', (e) => {
             for (var i = 0; i < data.length; i++) {
                 var item = data[i]
                 html += `<div class="card horizontal">
-                            <div class="card-image">
-                                <img src="./img/home.jpg">
-                            </div>
-                            <div class="card-stacked">
-                                <div class="card-content">
-                                    <div>
-                                        <b>Direccion: </b><p>${item.Direccion}</p>
+                                <div class="card-image">
+                                    <img src="./img/home.jpg">
+                                </div>
+                                <div class="card-stacked">
+                                    <div class="card-content">
+                                        <div>
+                                            <b>Direccion: </b><p>${item.Direccion}</p>
+                                        </div>
+                                        <div>
+                                            <b>Ciudad: </b><p>${item.Ciudad}</p>
+                                        </div>
+                                        <div>
+                                            <b>Teléfono: </b><p>${item.Telefono}</p>
+                                        </div>
+                                        <div>
+                                            <b>Código postal: </b><p>${item.Codigo_Postal}</p>
+                                        </div>
+                                        <div>
+                                            <b>Precio: </b><p>${item.Precio}</p>
+                                        </div>
+                                        <div>
+                                            <b>Tipo: </b><p>${item.Tipo}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <b>Ciudad: </b><p>${item.Ciudad}</p>
-                                    </div>
-                                    <div>
-                                        <b>Teléfono: </b><p>${item.Telefono}</p>
-                                    </div>
-                                    <div>
-                                        <b>Código postal: </b><p>${item.Codigo_Postal}</p>
-                                    </div>
-                                    <div>
-                                        <b>Precio: </b><p>${item.Precio}</p>
-                                    </div>
-                                    <div>
-                                        <b>Tipo: </b><p>${item.Tipo}</p>
+                                    <div class="card-action right-align">
+                                        <a href="#">Ver más</a>
                                     </div>
                                 </div>
-                                <div class="card-action right-align">
-                                    <a href="#">Ver más</a>
-                                </div>
-                            </div>
-                        </div>`
+                            </div>`
             }
 
             $("#lista").html(html);
@@ -115,9 +140,10 @@ check.addEventListener('click', function () {
                 console.log(error);
             });
         $('#personalizada').show();
-    }
-    else {
+    } else {
         console.log('check desactivado')
+        document.getElementById("ciudad").innerHTML = "<option value='' selected>Escoge una ciudad</option>";
+        document.getElementById("tipo").innerHTML = "<option value='' selected>Escoge un tipo</option>";
         $('#personalizada').hide()
         prefer = false
     }
